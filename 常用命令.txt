@@ -1,0 +1,92 @@
+/*
+ * @Author: tanyongqiang 1157529280@qq.com
+ * @Date: 2025-06-01 09:48:05
+ * @LastEditors: tanyongqiang 1157529280@qq.com
+ * @LastEditTime: 2025-06-07 10:40:41
+ * @FilePath: \twip-napcat-ws\常用命令.txt
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+=== 本地执行的
+进入虚拟环境
+.venv\Scripts\activate.ps1
+
+安装复读机插件echo
+pip install nonebot-plugin-echo
+
+导出依赖列表
+pip freeze > requirements.txt
+
+
+=== 部署服务器linux
+先更新服务器的apt（ubuntu）
+sudo apt update
+sudo apt install -y \
+    pkg-config \
+    libmysqlclient-dev \
+    default-libmysqlclient-dev \
+    python3-dev \
+    gcc
+
+创建虚拟环境
+python3 -m venv twipenv
+
+服务器虚拟环境
+source twipenv/bin/activate
+
+退出虚拟环境
+deactivate
+
+安装依赖
+pip install -r requirements.txt
+
+其它需要手动安装的依赖
+pip install mysqlclient
+pip install Pillow
+pip install httpx
+
+检查依赖
+pip freeze
+
+直接停掉某个端口下的程序
+lsof -t -i:8095 | xargs kill -9 2>/dev/null || echo "端口没有被占用"
+
+启动机器人
+nohup python bot.py > bot.log 2>&1 &
+
+=== 其它
+安装mysql
+docker pull mysql:8
+docker run --name=twip-mysql -e MYSQL_ROOT_PASSWORD=密码 -p 3306:3306 -d mysql:8
+
+服务器安装mysql依赖的时候需要执行的
+sudo apt-get update
+sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+
+加权限
+chmod +x start_bot.sh
+
+安装napcat
+sudo docker run -d \
+-e NAPCAT_GID=$(id -g) \
+-e NAPCAT_UID=$(id -u) \
+-p 8095:8095 \
+-p 6099:6099 \
+--add-host=host.docker.internal:host-gateway \
+--name napcat \
+--restart=always \
+docker.1ms.run/mlikiowa/napcat-docker:latest
+
+
+
+
+# 启动
+./start_bot.sh start
+
+# 停止
+./start_bot.sh stop
+
+# 重启
+./start_bot.sh restart
+
+# 查看状态
+./start_bot.sh status
