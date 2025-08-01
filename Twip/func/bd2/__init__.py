@@ -6,6 +6,7 @@ from nonebot.plugin import PluginMetadata
 
 from tool.find_power.format_data import is_level_S
 from tool.utils.logger import logger as my_logger
+from tool.QsPilUtils2.dao import text_to_image
 
 from .payload import get_data
 
@@ -61,4 +62,9 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=80):
     user_id = str(event.user_id)
     await user_bind.send(f"user_id={user_id}:开始处理，耗时较久请耐心等待")
     result = await get_data.redeem_all_coupons_for_user(user_id)
-    await user_bind.finish(result)
+    image_path = text_to_image(result)
+    with open(image_path, "rb") as f:
+        image_data = f.read()
+    base64_str = f"base64://{base64.b64encode(image_data).decode()}"
+    image_msg = MessageSegment.image(base64_str)
+    await user_bind.finish(image_msg)
