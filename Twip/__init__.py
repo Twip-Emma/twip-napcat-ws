@@ -118,7 +118,7 @@ async def shutdown():
 
 # 加载自己写的模块
 # load_plugins("Twip/admin")
-# load_plugins("Twip/function")
+load_plugins("Twip/func")
 load_plugins("Twip/user")
 load_plugins("Twip/listener")
 # load_plugins("Twip/speaker")

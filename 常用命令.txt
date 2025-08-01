@@ -2,7 +2,7 @@
  * @Author: tanyongqiang 1157529280@qq.com
  * @Date: 2025-06-01 09:48:05
  * @LastEditors: tanyongqiang 1157529280@qq.com
- * @LastEditTime: 2025-06-07 10:40:41
+ * @LastEditTime: 2025-07-19 00:38:30
  * @FilePath: \twip-napcat-ws\常用命令.txt
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -67,14 +67,20 @@ chmod +x start_bot.sh
 
 安装napcat
 sudo docker run -d \
--e NAPCAT_GID=$(id -g) \
--e NAPCAT_UID=$(id -u) \
--p 8095:8095 \
--p 6099:6099 \
---add-host=host.docker.internal:host-gateway \
---name napcat \
---restart=always \
-docker.1ms.run/mlikiowa/napcat-docker:latest
+  -e NAPCAT_GID=$(id -g) \
+  -e NAPCAT_UID=$(id -u) \
+  -p 8095:8095 \
+  -p 6099:6099 \
+  -p 9051:9051 \
+  -p 9052:9052 \
+  -p 9053:9053 \
+  --add-host=host.docker.internal:host-gateway \
+  --name napcat \
+  --restart=always \
+  -v /root/bot/twip-napcat-cache/napcat_data:/app/data \
+  -v /root/bot/twip-napcat-cache/napcat_cache:/app/cache \
+  -v /root/bot/twip-napcat-cache/napcat_config:/app/config \
+  docker.1ms.run/mlikiowa/napcat-docker:latest
 
 
 
