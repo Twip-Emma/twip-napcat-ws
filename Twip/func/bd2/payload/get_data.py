@@ -100,3 +100,89 @@ async def _get_single_redeem_result(
 
     except Exception as e:
         return f"{nickname}: 请求失败({str(e)})"
+
+
+async def redeem_all_coupons_for_user(user_id: str) -> str:
+    """
+    为指定用户兑换所有可用兑换码
+    :param user_id: 用户ID
+    :return: 兑换结果字符串
+    """
+    nicknames = get_db.get_user_nicknames(user_id)
+    if not nicknames:
+        return "该QQ号未绑定任何游戏昵称"
+    
+    # 获取所有兑换码
+    coupons = await fetch_redeem_codes()
+    if not coupons:
+        return "未能获取到任何兑换码"
+    
+    results = []
+    
+    for coupon in coupons:
+        code = coupon["code"]
+        reward = coupon["reward"]
+        status = coupon["status"]
+        
+        # 添加兑换码信息
+        results.append(f"兑换码: {code} | 奖励: {reward} | 有效期: {status}")
+        
+        # 为每个昵称兑换该兑换码
+        async with aiohttp.ClientSession() as session:
+            tasks = [
+                _get_single_redeem_result(session, nickname, code)
+                for nickname in nicknames
+            ]
+            redeem_results = await asyncio.gather(*tasks)
+            results.extend(redeem_results)
+    
+    return "\n".join(results)
+
+async def _get_single_redeem_result(
+    session: aiohttp.ClientSession, 
+    nickname: str, 
+    coupon_code: str
+) -> str:
+    """
+    获取单个昵称的兑换结果（内部方法）
+    :return: 格式 "昵称: 消息"
+    """
+    url = "https://loj2urwaua.execute-api.ap-northeast-1.amazonaws.com/prod/coupon"
+    headers = {
+        "Content-Type": "application/json",
+        "access-control-allow-origin": "https://redeem.bd2.pmang.cloud",
+    }
+    payload = {
+        "appId": "bd2-live",
+        "userId": nickname,
+        "code": coupon_code,
+    }
+    try:
+        async with session.post(url, json=payload, headers=headers) as response:
+            data = await response.json(content_type=None)
+            message = data.get("message", "兑换成功")
+            
+            # 韩语错误消息翻译
+            if message == "쿠폰 사용 기간이 지났습니다.":
+                message = "兑换码已过期"
+            elif message == "이미 사용한 쿠폰입니다. (키워드)":
+                message = "兑换码已被使用"
+                
+            return f"{nickname}: {message}"
+
+    except Exception as e:
+        return f"{nickname}: 请求失败({str(e)})"
+
+
+# 需要人工维护
+async def fetch_redeem_codes() -> List[Dict]:
+    return [{"code":"2025BD2AUG","reward":"2抽","status":"2025/9/1"},{"code":"BD2SDCC2025","reward":"600鑽","status":"2025/8/24"},{"code":"BURAJOCODE03C","reward":"3抽","status":"2025/7/20"},{"code":"BD2BW2025","reward":"600鑽","status":"2025/8/11"},{"code":"2025BD2JUL","reward":"2抽","status":"2025/8/1"},{"code":"BD2RADIO0701","reward":"3抽","status":"2025/8/31"},{"code":"BD2025SUMMER","reward":"一張酒館的5星招募卷","status":"目前可用"},{"code":"Waiting4legend","reward":"頂級毒蛇之手","status":"目前可用"}]
+    """获取可用的兑换码列表"""
+    url = "https://thedb2pulse-api.zzz-archive-back-end.workers.dev/redeem"
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                return await response.json()
+            return []
+

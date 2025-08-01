@@ -22,7 +22,7 @@ __plugin_meta__ = PluginMetadata(
 user_bind = on_command("绑定", block=True, priority=2)
 @user_bind.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=15):
+async def _(bot: Bot, event: GroupMessageEvent, cost=10):
     user_id = str(event.user_id)
     args = str(event.get_message()).strip().split()
     if len(args) != 2:
@@ -35,7 +35,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=15):
 user_delete = on_command("删除绑定", block=True, priority=2)
 @user_delete.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=15):
+async def _(bot: Bot, event: GroupMessageEvent, cost=10):
     user_id = str(event.user_id)
     success, msg = await get_data.delete_user_bindings(user_id=user_id)
     await user_bind.finish(msg)
@@ -44,7 +44,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=15):
 user_redeem = on_command("兑换", block=True, priority=2)
 @user_redeem.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=50):
+async def _(bot: Bot, event: GroupMessageEvent, cost=30):
     user_id = str(event.user_id)
     args = str(event.get_message()).strip().split()
     if len(args) != 2:
@@ -54,9 +54,11 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=50):
     await user_bind.finish(msg)
 
 
-user_redeem = on_command("兑换全部", block=True, priority=2)
-@user_redeem.handle()
+user_redeem_all = on_command("兑换全部", block=True, priority=2)
+@user_redeem_all.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=5):
+async def _(bot: Bot, event: GroupMessageEvent, cost=80):
     user_id = str(event.user_id)
-    await user_bind.finish(f"qq={user_id}，本功能维护中")
+    await user_bind.send(f"user_id={user_id}:开始处理，耗时较久请耐心等待")
+    result = await get_data.redeem_all_coupons_for_user(user_id)
+    await user_bind.finish(result)
