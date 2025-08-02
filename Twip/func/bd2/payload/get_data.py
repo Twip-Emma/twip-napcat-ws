@@ -187,3 +187,35 @@ async def fetch_redeem_codes() -> List[Dict]:
                 return await response.json()
             return []
 
+
+async def get_coupon_all() -> str:
+    resp = "棕色尘埃2有效兑换码\n"
+    data = get_db.get_valid_coupons()
+    if data == []:
+        return "兑换码列表为空"
+    else:
+        index = 1
+        for item in data:
+            resp += f"{index}:{item[1]} | {item[2]}\n"
+    return resp[len(resp)-2:]
+
+
+async def add_coupon(coupon_code: str, description: str, valid_date_str: str) -> str:
+    v_date = "";
+    if valid_date_str == "永久":
+        v_date = "2999-01-01"
+    else:
+        v_date = valid_date_str
+    resp = get_db.add_coupon(coupon_code, description, v_date)
+    if not resp:
+        return "添加失败"
+    else:
+        return "添加成功"
+
+
+async def delete_coupon(coupon_code: str) -> str:
+    resp = get_db.delete_coupon(coupon_code)
+    if not resp:
+        return "添加失败"
+    else:
+        return "添加成功"
