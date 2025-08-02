@@ -20,7 +20,7 @@ from .payload.image_dao import get_card
 __plugin_meta__ = PluginMetadata(
     name='个人信息',
     description='查看自己的行动点和健康值',
-    usage='''使用方式：个人信息''',
+    usage='''个人信息\n升级''',
     extra={'version': 'v1.0.0',
            'cost': '无消耗'}
 )

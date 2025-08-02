@@ -12,16 +12,20 @@ from io import BytesIO
 import time
 from tool.utils import db
 import MySQLdb
-from os import path
+from pathlib import Path
 from Twip import TTF_PATH
 
 from PIL import Image, ImageDraw, ImageFont
 
-FILE_PATH = path.join(path.dirname(__file__))
+FILE_PATH = Path(__file__).parent.absolute()
+    
+# 构建字体文件路径（自动处理路径分隔符）
+FONT_PATH = FILE_PATH / "consola-1.ttf"
 
 
 # 设定一个时间 2021年1月20日
-OLD_TIME = time.strptime("2021-01-20 00:00:00", "%Y-%m-%d %H:%M:%S")
+# WS机器人统计时间 2025年7月25日
+OLD_TIME = time.strptime("2025-07-25 00:00:00", "%Y-%m-%d %H:%M:%S")
 
 
 # 获取现在的时间
@@ -62,7 +66,7 @@ def data_to_image(data,type:str) -> str:
         rank += 1
     bg = Image.new("RGB",(650,5000), (255,255,255))
     dr = ImageDraw.Draw(bg)
-    font = ImageFont.truetype(f"{FILE_PATH}\\consola-1.ttf", 20)
+    font = ImageFont.truetype(FONT_PATH, 20)
     dr.text((10,200), text=text1, font=font, fill="#000000")
     ################################################
     text2 = ""
@@ -131,7 +135,7 @@ def get_speak_rank_today(type:str):
         rank += 1
     bg = Image.new("RGB",(650,5000), (255,255,255))
     dr = ImageDraw.Draw(bg)
-    font = ImageFont.truetype(f"{FILE_PATH}\\consola-1.ttf", 20)
+    font = ImageFont.truetype(FONT_PATH, 20)
     dr.text((10,200), text=text1, font=font, fill="#000000")
     ################################################
     text2 = ""

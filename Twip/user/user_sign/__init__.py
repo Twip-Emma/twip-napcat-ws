@@ -20,7 +20,7 @@ from .payload import user_pkg
 __plugin_meta__ = PluginMetadata(
     name='求签系统',
     description='获得一张引子',
-    usage='''使用方式：求签''',
+    usage='''求签''',
     extra={'version': 'v2.0.0',
            'cost': '15'}
 )

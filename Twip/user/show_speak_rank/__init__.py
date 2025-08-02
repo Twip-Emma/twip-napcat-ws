@@ -17,7 +17,7 @@ from .db import *
 __plugin_meta__ = PluginMetadata(
     name='水群排行',
     description='查看机器人所有群综合的水群排行榜前99名',
-    usage='''查看水群排行''',
+    usage='''查看水群排行\n查看今日水群排行\n查看水群排行-开发者模式（超级管理员）\n查看今日水群排行-开发者模式（超级管理员）''',
     extra={'version': 'v1.0.0',
            'cost': '10'}
 )
@@ -28,7 +28,7 @@ show_rank = on_command("查看水群排行", block=True, priority=2, state={
     'pm_describe': '查看所有群的水群前99名',
     'pm_priority': 2
 })
-show_rank_admin = on_command("查看水群排行-开发者模式", block=True, priority=2, state={
+show_rank_admin = on_command("查看水群排行-开发者模式",  block=True, priority=2, state={
     'pm_usage': '**查看水群排行-开发者模式',
     'pm_describe': '查看所有群的水群前99名，显示完整QQ号',
     'pm_priority': 2
