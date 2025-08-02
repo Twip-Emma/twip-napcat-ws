@@ -413,17 +413,6 @@ def simple_text(
 
 
 def calculate_text_size(text: str, size: int, font: Path | str) -> Tuple[int, int]:
-    """
-    Calculate the rendered dimensions of given text.
-    
-    Args:
-        text: Text to measure
-        size: Font size in points
-        font: Path to font file
-        
-    Returns:
-        Tuple of (width, height) in pixels
-    """
     font = ImageFont.truetype(str(font), size)
     bbox = font.getbbox(text)
     return (bbox[2] - bbox[0], bbox[3] - bbox[1])
@@ -561,9 +550,12 @@ def multi_text(
             line_height = 0
             for piece in line:
                 using_font = ImageFont.truetype(piece["fonts"], piece["size"])
-                _, piece_height = using_font.getsize(piece["text"])
+                # Modern Pillow text measurement
+                bbox = using_font.getbbox(piece["text"])
+                piece_height = bbox[3] - bbox[1]  # bottom - top
                 if piece_height > line_height:
                     line_height = piece_height
+            
             if total_height + line_height + spacing > box_size[1]:
                 if get_surplus:
                     lines_text = []
@@ -579,7 +571,6 @@ def multi_text(
                             line_texts.append(piece_text)
                         lines_text.append("".join(line_texts))
                     surplus_text = "\n".join(lines_text)
-
                     total_lines = total_lines[:i]
                 else:
                     total_lines = total_lines[:i]
@@ -593,8 +584,10 @@ def multi_text(
             line_height, line_width = 0, 0
             for piece in line:
                 using_font = ImageFont.truetype(piece["fonts"], piece["size"])
-                piece_width = using_font.getsize(piece["text"])[0]
-                piece_height = using_font.getsize(piece["text"])[1]
+                # Modern Pillow text measurement
+                bbox = using_font.getbbox(piece["text"])
+                piece_width = bbox[2] - bbox[0]  # right - left
+                piece_height = bbox[3] - bbox[1]  # bottom - top
                 line_width += piece_width
                 if piece_height > line_height:
                     line_height = piece_height
@@ -620,13 +613,16 @@ def multi_text(
     pos = (0 + default_stroke_width, 0 + default_stroke_width)
     line_start_pos = list(pos)
     # 对片进行分行，测量，显示
-    for x in total_lines:
+    for line in total_lines:
         pieces_sizes = []
-        for y in x:
-            using_font = ImageFont.truetype(y["fonts"], y["size"])
-            pieces_sizes.append(using_font.getsize(y["text"]))
-        height_list = [x[1] for x in pieces_sizes]
-        width_list = [x[0] for x in pieces_sizes]
+        for piece in line:
+            using_font = ImageFont.truetype(piece["fonts"], piece["size"])
+            # Modern Pillow text measurement
+            bbox = using_font.getbbox(piece["text"])
+            pieces_sizes.append((bbox[2] - bbox[0], bbox[3] - bbox[1]))  # (width, height)
+        
+        height_list = [h for _, h in pieces_sizes]
+        width_list = [w for w, _ in pieces_sizes]
         max_height = max(height_list)
         total_width = sum(width_list) + len(width_list) * spacing
         if horizontal_align == "left":
@@ -638,25 +634,25 @@ def multi_text(
                 true_box_size[0] + line_start_pos[0] - total_width,
                 line_start_pos[1],
             ]
-        for index2, y in enumerate(x):
+        for index, piece in enumerate(line):
             if vertical_align == "top":
                 pos[1] = line_start_pos[1]
             elif vertical_align == "middle":
                 pos[1] = line_start_pos[1] + int(
-                    (max_height - pieces_sizes[index2][1]) / 2
+                    (max_height - pieces_sizes[index][1]) / 2
                 )
             elif vertical_align == "bottom":
-                pos[1] = line_start_pos[1] + max_height - pieces_sizes[index2][1]
-            using_font = ImageFont.truetype(y["fonts"], y["size"])
+                pos[1] = line_start_pos[1] + max_height - pieces_sizes[index][1]
+            using_font = ImageFont.truetype(piece["fonts"], piece["size"])
             draw.text(
                 pos,
-                y["text"],
-                fill=y["color"],
+                piece["text"],
+                fill=piece["color"],
                 font=using_font,
-                stroke_width=y["stroke_width"],
-                stroke_fill=y["stroke_fill"],
+                stroke_width=piece["stroke_width"],
+                stroke_fill=piece["stroke_fill"],
             )
-            pos[0] += pieces_sizes[index2][0]
+            pos[0] += pieces_sizes[index][0]
         line_start_pos[1] += max_height + spacing
     if get_surplus:
         return img, surplus_text

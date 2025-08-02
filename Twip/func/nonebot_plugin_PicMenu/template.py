@@ -81,6 +81,7 @@ class DefaultTemplate(PicTemplate):
         with (cwd / "menu_config" / "config.json").open("r", encoding="utf-8") as fp:
             config = json.loads(fp.read())
         self.using_font = config["default"]
+        print(f"字体{self.using_font}")
 
     def generate_main_menu(self, data) -> Image:
         # 列数

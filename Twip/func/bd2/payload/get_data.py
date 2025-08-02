@@ -176,7 +176,8 @@ async def _get_single_redeem_result(
 
 # 需要人工维护
 async def fetch_redeem_codes() -> List[Dict]:
-    return [{"code":"2025BD2AUG","reward":"2抽","status":"2025/9/1"},{"code":"BD2SDCC2025","reward":"600鑽","status":"2025/8/24"},{"code":"BURAJOCODE03C","reward":"3抽","status":"2025/7/20"},{"code":"BD2BW2025","reward":"600鑽","status":"2025/8/11"},{"code":"2025BD2JUL","reward":"2抽","status":"2025/8/1"},{"code":"BD2RADIO0701","reward":"3抽","status":"2025/8/31"},{"code":"BD2025SUMMER","reward":"一張酒館的5星招募卷","status":"目前可用"},{"code":"Waiting4legend","reward":"頂級毒蛇之手","status":"目前可用"}]
+    return [{"code":"BD2RADIO0801","reward":"3抽","status":""},{"code":"2025BD2AUG","reward":"2抽","status":"2025/9/1"},{"code":"BD2SDCC2025","reward":"600鑽","status":"2025/8/24"},{"code":"BD2BW2025","reward":"600鑽","status":"2025/8/11"},{"code":"BD2RADIO0701","reward":"3抽","status":"2025/8/31"},{"code":"BD2025SUMMER","reward":"一張酒館的5星招募卷","status":"目前可用"},{"code":"Waiting4legend","reward":"頂級毒蛇之手","status":"目前可用"}]
+    
     """获取可用的兑换码列表"""
     url = "https://thedb2pulse-api.zzz-archive-back-end.workers.dev/redeem"
     

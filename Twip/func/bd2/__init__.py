@@ -14,7 +14,7 @@ from .payload import get_data
 __plugin_meta__ = PluginMetadata(
     name='棕色尘埃2兑换码',
     description='自动兑换兑换码',
-    usage='''使用方式(参数之间有空格)：\n绑定<游戏昵称>\n删除绑定\n兑换<兑换码>''',
+    usage='''使用方式(参数之间有空格)：\n绑定<游戏昵称>\n删除绑定\n兑换<兑换码>\n兑换全部''',
     extra={'version': 'v2.0.0',
            'cost': '15'}
 )
