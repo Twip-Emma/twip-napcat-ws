@@ -14,13 +14,13 @@ from .database import start
 
 
 from nonebot.plugin import PluginMetadata
-__plugin_meta__ = PluginMetadata(
-    name='静默者-信息更新',
-    description='功能：记录每个人的发言数量总数',
-    usage='''使用方式：无【静默模块】''',
-    extra={'version': 'v0.1.0',
-           'cost': '无消耗'}
-)
+# __plugin_meta__ = PluginMetadata(
+#     name='静默者-信息更新',
+#     description='功能：记录每个人的发言数量总数',
+#     usage='''使用方式：无【静默模块】''',
+#     extra={'version': 'v0.1.0',
+#            'cost': '无消耗'}
+# )
 
 
 # 注册消息响应器

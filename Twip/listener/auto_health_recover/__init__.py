@@ -13,13 +13,13 @@ from nonebot import require
 from nonebot.plugin import PluginMetadata
 from tool.utils import db
 
-__plugin_meta__ = PluginMetadata(
-    name='静默者-健康回复',
-    description='功能：涩图功能的健康回复系统',
-    usage='''使用方式：无【静默模块】''',
-    extra={'version': 'v0.0.1',
-           'cost': '无消耗'}
-)
+# __plugin_meta__ = PluginMetadata(
+#     name='静默者-健康回复',
+#     description='功能：涩图功能的健康回复系统',
+#     usage='''使用方式：无【静默模块】''',
+#     extra={'version': 'v0.0.1',
+#            'cost': '无消耗'}
+# )
 
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler

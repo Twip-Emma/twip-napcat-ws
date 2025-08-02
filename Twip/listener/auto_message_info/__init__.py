@@ -11,13 +11,13 @@ from .db import insert_into_sql
 from tool.utils import message_utils
 
 from nonebot.plugin import PluginMetadata
-__plugin_meta__ = PluginMetadata(
-    name='静默者-消息记录',
-    description='功能：记录机器人所在群每条发言记录',
-    usage='''使用方式：无【静默模块】''',
-    extra={'version': 'v0.0.1',
-           'cost': '无消耗'}
-)
+# __plugin_meta__ = PluginMetadata(
+#     name='静默者-消息记录',
+#     description='功能：记录机器人所在群每条发言记录',
+#     usage='''使用方式：无【静默模块】''',
+#     extra={'version': 'v0.0.1',
+#            'cost': '无消耗'}
+# )
 
 
 

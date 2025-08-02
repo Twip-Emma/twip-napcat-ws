@@ -15,13 +15,13 @@ from tool.utils import message_utils
 import json
 from tool.utils import db
 
-__plugin_meta__ = PluginMetadata(
-    name='静默者-闪照撤回',
-    description='功能：破解闪照、破解撤回',
-    usage='''使用方式：无【静默模块】''',
-    extra={'version': 'v1.0.1',
-           'cost': '无消耗'}
-)
+# __plugin_meta__ = PluginMetadata(
+#     name='静默者-闪照撤回',
+#     description='功能：破解闪照、破解撤回',
+#     usage='''使用方式：无【静默模块】''',
+#     extra={'version': 'v1.0.1',
+#            'cost': '无消耗'}
+# )
 
 recall_matcher = on_notice(priority=10, block=True)
 
