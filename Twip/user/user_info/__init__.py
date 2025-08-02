@@ -64,6 +64,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=0):
     if not user_data:
         insert_user_info_new(user_id=user_id)
         user_data = get_user_info_new(user_id=user_id)
+    user_data = user_data[0]
     level_data:dict = find_coin_max(user_data[4])
 
     # 判断画境币是否足够
