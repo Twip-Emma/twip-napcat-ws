@@ -63,7 +63,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=80):
     user_id = str(event.user_id)
     await user_bind.send(f"user_id={user_id}:开始处理，耗时较久请耐心等待")
     result = await get_data.redeem_all_coupons_for_user(user_id)
-    image_path = text_to_image(result, 10, (10, 10))
+    image_path = text_to_image(result, 15, (10, 10))
     with open(image_path, "rb") as f:
         image_data = f.read()
     base64_str = f"base64://{base64.b64encode(image_data).decode()}"
@@ -76,7 +76,7 @@ get_coupon_all = on_command("兑换码列表", block=True, permission=SUPERUSER,
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=0):
     result = await get_data.get_coupon_all()
-    image_path = text_to_image(result)
+    image_path = text_to_image(result, 15, (10, 10))
     with open(image_path, "rb") as f:
         image_data = f.read()
     base64_str = f"base64://{base64.b64encode(image_data).decode()}"

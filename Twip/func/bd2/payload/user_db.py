@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+from datetime import datetime
 from typing import Optional, Tuple, List
 
 class Database:

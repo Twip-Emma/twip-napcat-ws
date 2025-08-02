@@ -176,16 +176,34 @@ async def _get_single_redeem_result(
 
 # 需要人工维护
 async def fetch_redeem_codes() -> List[Dict]:
-    return [{"code":"BD2RADIO0801","reward":"3抽","status":""},{"code":"2025BD2AUG","reward":"2抽","status":"2025/9/1"},{"code":"BD2SDCC2025","reward":"600鑽","status":"2025/8/24"},{"code":"BD2BW2025","reward":"600鑽","status":"2025/8/11"},{"code":"BD2RADIO0701","reward":"3抽","status":"2025/8/31"},{"code":"BD2025SUMMER","reward":"一張酒館的5星招募卷","status":"目前可用"},{"code":"Waiting4legend","reward":"頂級毒蛇之手","status":"目前可用"}]
+    data = get_db.get_valid_coupons()
+    resp = []
+    if data == []:
+        return []
+    else:
+        for item in data:
+            resp.append({
+                "code":item[1],
+                "reward":item[2],
+                "status":str(item[3])
+            })
+    return resp
+    # return [{"code":"BD2RADIO0801","reward":"3抽","status":""},
+    #         {"code":"2025BD2AUG","reward":"2抽","status":"2025/9/1"},
+    #         {"code":"BD2SDCC2025","reward":"600鑽","status":"2025/8/24"},
+    #         {"code":"BD2BW2025","reward":"600鑽","status":"2025/8/11"},
+    #         {"code":"BD2RADIO0701","reward":"3抽","status":"2025/8/31"},
+    #         {"code":"BD2025SUMMER","reward":"一張酒館的5星招募卷","status":"目前可用"},
+    #         {"code":"Waiting4legend","reward":"頂級毒蛇之手","status":"目前可用"}]
     
-    """获取可用的兑换码列表"""
-    url = "https://thedb2pulse-api.zzz-archive-back-end.workers.dev/redeem"
-    
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status == 200:
-                return await response.json()
-            return []
+    # 下面的api获取最新兑换码，但是需要翻墙
+    # """获取可用的兑换码列表"""
+    # url = "https://thedb2pulse-api.zzz-archive-back-end.workers.dev/redeem"
+    # async with aiohttp.ClientSession() as session:
+    #     async with session.get(url) as response:
+    #         if response.status == 200:
+    #             return await response.json()
+    #         return []
 
 
 async def get_coupon_all() -> str:
@@ -197,7 +215,8 @@ async def get_coupon_all() -> str:
         index = 1
         for item in data:
             resp += f"{index}:{item[1]} | {item[2]}\n"
-    return resp[len(resp)-2:]
+            index += 1
+    return resp
 
 
 async def add_coupon(coupon_code: str, description: str, valid_date_str: str) -> str:
