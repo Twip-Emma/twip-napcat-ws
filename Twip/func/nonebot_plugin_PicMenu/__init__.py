@@ -8,6 +8,8 @@ from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
+from tool.find_power.format_data import is_level_S
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, MessageSegment
 
 from .img_tool import img2bytes
 from .manager import MenuManager
@@ -30,7 +32,8 @@ switch = on_fullmatch("开关菜单", permission=SUPERUSER | GROUP_ADMIN, priori
 
 
 @switch.handle()
-async def _(matcher: Matcher):
+@is_level_S
+async def _(matcher: Matcher, cost=0):
     global menu_switch
     menu_switch = not menu_switch
 
@@ -48,7 +51,8 @@ menu = on_command("菜单", aliases={"功能", "帮助"}, rule=menu_rule, priori
 
 
 @menu.handle()
-async def _(matcher: Matcher, arg: Message = CommandArg()):
+@is_level_S
+async def _(event: GroupMessageEvent, matcher: Matcher, arg: Message = CommandArg(), cost=10):
     msg = arg.extract_plain_text().strip()
 
     if not msg:  # 参数为空，主菜单
