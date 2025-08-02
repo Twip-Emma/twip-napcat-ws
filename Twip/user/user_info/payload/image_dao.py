@@ -42,7 +42,6 @@ async def get_card(user_id: str, user_name: str) -> str:
 
     # 获取数据
     user_data = get_user_info_new(user_id=user_id)
-    user_data = user_data[0]
     user_data_old = get_user_info_old(user_id=user_id)
     if not user_data:
         insert_user_info_new(user_id=user_id)
