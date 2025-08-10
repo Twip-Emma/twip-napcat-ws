@@ -151,6 +151,7 @@ async def _get_single_redeem_result(
     headers = {
         "Content-Type": "application/json",
         "access-control-allow-origin": "https://redeem.bd2.pmang.cloud",
+        "referer": "https://redeem.bd2.pmang.cloud/"
     }
     payload = {
         "appId": "bd2-live",
