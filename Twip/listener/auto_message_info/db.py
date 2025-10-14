@@ -17,12 +17,12 @@ def insert_into_sql(message_id, message_context, group_id, user_id):
     now_time = datetime.datetime.now()
     now_time = now_time.strftime('%Y-%m-%d %H:%M:%S')
     try:
-        sql = "INSERT INTO message_info VALUES(%s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO message_info (database_id, message_id, message_context, group_id, user_id, time)VALUES(%s, %s, %s, %s, %s, %s)"
         args = (f'{uid}', f'{message_id}', f"{message_context}",
                 f"{group_id}", f"{user_id}", f"{now_time}")
         db.sql_dml(sql, args)
     except:
-        sql = "INSERT INTO message_info VALUES(%s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO message_info (database_id, message_id, message_context, group_id, user_id, time)VALUES(%s, %s, %s, %s, %s, %s)"
         args = (f'{uid}', f'{message_id}', '消息太长了，这是个xml卡片或者分享链接',
                 f"{group_id}", f"{user_id}", f"{now_time}")
         db.sql_dml(sql, args)
