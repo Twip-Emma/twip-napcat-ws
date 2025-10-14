@@ -33,16 +33,27 @@ async def get_user_nicknames(user_id: str) -> List[str]:
         lambda: get_db.get_user_nicknames(user_id)
     )
 
-async def delete_user_bindings(user_id: str) -> Tuple[bool, str]:
+async def delete_user_bindings(user_id: str, nickname: str = None) -> Tuple[bool, str]:
     """异步删除当前QQ号的所有绑定"""
     loop = asyncio.get_event_loop()
-    success = await loop.run_in_executor(
-        None,
-        lambda: get_db.delete_user_bindings(user_id)
-    )
-    if success:
-        return True, f"已删除QQ={user_id}的所有绑定"
-    return False, "删除失败（数据库错误）"
+    success = False
+    if (nickname is None) :
+        success = await loop.run_in_executor(
+            None,
+            lambda: get_db.delete_user_bindings(user_id)
+        )
+        if success:
+            return True, f"已删除QQ={user_id}的所有绑定"
+        return False, "删除失败（数据库错误）"
+    else:
+        success = await loop.run_in_executor(
+            None,
+            lambda: get_db.delete_user_bindings_by_nickname(user_id=user_id,nickname=nickname)
+        )
+        if success:
+            return True, f"已删除QQ={user_id}的 {nickname} 的绑定"
+        return False, "删除失败（数据库错误）"
+    
 
 
 async def redeem_coupon(user_id: str, coupon_code: str) -> str:
@@ -236,6 +247,6 @@ async def add_coupon(coupon_code: str, description: str, valid_date_str: str) ->
 async def delete_coupon(coupon_code: str) -> str:
     resp = get_db.delete_coupon(coupon_code)
     if not resp:
-        return "添加失败"
+        return "删除失败"
     else:
-        return "添加成功"
+        return "删除成功"

@@ -1,12 +1,7 @@
-/*
- * @Author: tanyongqiang 1157529280@qq.com
- * @Date: 2025-06-01 09:48:05
- * @LastEditors: tanyongqiang 1157529280@qq.com
- * @LastEditTime: 2025-07-19 00:38:30
- * @FilePath: \twip-napcat-ws\常用命令.txt
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
 === 本地执行的
+创建虚拟环境
+python -m venv .venv
+
 进入虚拟环境
 .venv\Scripts\activate.ps1
 
@@ -71,19 +66,23 @@ sudo docker run -d \
   -e NAPCAT_UID=$(id -u) \
   -p 8095:8095 \
   -p 6099:6099 \
-  -p 9051:9051 \
-  -p 9052:9052 \
-  -p 9053:9053 \
+  -p 9501:9501 \
+  -p 9502:9502 \
+  -p 9503:9503 \
   --add-host=host.docker.internal:host-gateway \
-  --name napcat \
+  --name napcat3 \
   --restart=always \
   -v /root/bot/twip-napcat-cache/napcat_data:/app/data \
   -v /root/bot/twip-napcat-cache/napcat_cache:/app/cache \
   -v /root/bot/twip-napcat-cache/napcat_config:/app/config \
   docker.1ms.run/mlikiowa/napcat-docker:latest
 
+# 访问napcat
+http://你的服务器IP:6099/webui/web_login
 
 
+# 添加权限
+chmod +x ./start_bot.sh
 
 # 启动
 ./start_bot.sh start
@@ -119,5 +118,31 @@ find <ft(.*)> 会得到一个对象
 反向切割得到标签外文本内容（左边）[end:]
 
 至此 我是<ft color=(224,164,25)>七画 就解析完毕了
+
+
+视频配置：腾讯云（2c2g3m）、本地电脑win11、连接服务器：WindTerm
+
+部署流程：
+1.安装docker（我的是腾讯云的docker镜像，自带docker了）
+2.本地下好代码丢到服务器里面
+3.服务器安装虚拟环境
+4.进入虚拟环境安装依赖
+5.通过docker部署下载napcat
+6.启动napcat后本地进入页面访问http://你的服务器IP:6099/webui/web_login 进入控制台
+7.在控制台内添加网络配置（告诉napcat机器人的通信地址）
+8.去机器人根目录.env配置超级管理员，如果没有这个文件请参考.env.template
+8.重启机器人
+
+基本命令：
+兑换 <兑换码>
+绑定 <你的游戏昵称>
+删除绑定
+兑换全部
+
+（超级管理员）基本命令：
+兑换码列表
+添加兑换码 <兑换码> <描述> <yyyy-MM-dd（有效时间）/永久>
+删除兑换码 <兑换码>
+
 
 

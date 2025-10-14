@@ -15,7 +15,17 @@ from .payload import get_data
 __plugin_meta__ = PluginMetadata(
     name='兑换码',
     description='棕色尘埃2自动兑换兑换码',
-    usage='''使用方式(参数之间有空格)：\n绑定<游戏昵称>\n删除绑定\n兑换<兑换码>\n兑换全部\n兑换码列表（超级管理员）\n添加兑换码<兑换码><描述><yyyy-MM-dd/永久>（超级管理员）\n删除兑换码<兑换码>（超级管理员）''',
+    usage='''
+    使用方式(参数之间有空格)：
+    =========================
+    绑定<游戏昵称>
+    删除绑定<游戏昵称(可选)>
+    兑换<兑换码>
+    兑换全部
+    <ft color=(255,0,0)>超级管理员</ft>兑换码列表
+    <ft color=(255,0,0)>超级管理员</ft>添加兑换码<兑换码><描述><yyyy-MM-dd/永久>
+    <ft color=(255,0,0)>超级管理员</ft>删除兑换码<兑换码>
+    ''',
     extra={'version': 'v2.0.0',
            'cost': '15'}
 )
@@ -28,7 +38,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=10):
     user_id = str(event.user_id)
     args = str(event.get_message()).strip().split()
     if len(args) != 2:
-        await user_bind.finish("格式错误，请用：绑定+(空格)+(游戏昵称)")
+        await user_bind.finish("格式错误，请发送以下命令查看标准格式：\n菜单 兑换码")
     command, nickname = args
     success, msg = await get_data.user_bind(user_id=user_id, nickname=nickname)
     await user_bind.finish(msg)
@@ -39,8 +49,16 @@ user_delete = on_command("删除绑定", block=True, priority=2)
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=10):
     user_id = str(event.user_id)
-    success, msg = await get_data.delete_user_bindings(user_id=user_id)
-    await user_bind.finish(msg)
+    args = str(event.get_message()).strip().split()
+    if len(args) == 1:
+        _, msg = await get_data.delete_user_bindings(user_id=user_id)
+        await user_bind.finish(msg)
+    elif len(args) == 2:
+        command, nickname = args
+        _, msg = await get_data.delete_user_bindings(user_id=user_id,nickname=nickname)
+        await user_bind.finish(msg)
+    else:
+        await user_bind.finish("格式错误，请发送以下命令查看标准格式：\n菜单 兑换码")
 
 
 user_redeem = on_command("兑换", block=True, priority=2)
@@ -50,7 +68,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=30):
     user_id = str(event.user_id)
     args = str(event.get_message()).strip().split()
     if len(args) != 2:
-        await user_bind.finish("格式错误，请用：兑换+(空格)+(兑换码)")
+        await user_bind.finish("格式错误，请发送以下命令查看标准格式：\n菜单 兑换码")
     command, coupon_code = args
     msg = await get_data.redeem_coupon(user_id=user_id, coupon_code=coupon_code)
     await user_bind.finish(msg)
@@ -90,7 +108,7 @@ add_coupon = on_command("添加兑换码", block=True, permission=SUPERUSER, pri
 async def _(bot: Bot, event: GroupMessageEvent, cost=0):
     args = str(event.get_message()).strip().split()
     if len(args) != 4:
-        await add_coupon.finish("格式错误，请用：添加兑换码<兑换码><描述><yyyy-MM-dd/永久>")
+        await add_coupon.finish("格式错误，请发送以下命令查看标准格式：\n菜单 兑换码")
     result = await get_data.add_coupon(args[1], args[2], args[3])
     await add_coupon.finish(result)
 
@@ -100,10 +118,12 @@ delete_coupon = on_command("删除兑换码", block=True, permission=SUPERUSER, 
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=0):
     args = str(event.get_message()).strip().split()
-    if len(args) != 4:
-        await delete_coupon.finish("格式错误，请用：删除兑换码<兑换码>")
-    result = await get_data.delete_coupon(args[1])
-    await delete_coupon.finish(result)
+    if len(args) == 2:
+        result = await get_data.delete_coupon(args[1])
+        await delete_coupon.finish(result)
+    else:
+        await delete_coupon.finish("格式错误，请发送以下命令查看标准格式：\n菜单 兑换码")
+    
 
 
 

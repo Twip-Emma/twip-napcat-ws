@@ -56,6 +56,18 @@ class Database:
             )
             return [row[0] for row in cursor.fetchall()]
 
+    def delete_user_bindings_by_nickname(self, user_id: str, nickname: str) -> bool:
+        """删除当前QQ号的所有绑定关系（物理删除）"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute(
+                    "DELETE FROM user_bind WHERE user_id=? and nickname=?",
+                    (user_id,nickname)
+                )
+            return True
+        except sqlite3.Error:
+            return False
+        
     def delete_user_bindings(self, user_id: str) -> bool:
         """删除当前QQ号的所有绑定关系（物理删除）"""
         try:
