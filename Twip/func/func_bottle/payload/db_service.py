@@ -27,3 +27,12 @@ def select_bottle() -> List[Tuple]:
         return db.sql_dql(sql2, args)[0]
     except:
         return False
+    
+def add_user_info(user_id: str, count: int) -> bool:
+    try:
+        sql = "UPDATE user_info_new SET user_crime = user_crime + %s WHERE user_id = %s"
+        args = (f'{count}', f'{user_id}')
+        db.sql_dml(sql, args)
+        return True
+    except:
+        return False

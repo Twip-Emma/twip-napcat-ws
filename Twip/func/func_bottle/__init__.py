@@ -32,9 +32,15 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=30):
     if len(args) == 1:
         await add_bottle.finish("格式错误，请发送以下命令查看标准格式：\n菜单 漂流瓶")
     command, *content = args
+    if len(content) > 5000:
+        await add_bottle.finish("你发这么长想干嘛？")
     success = db_service.add_bottle(user_id = user_id, content = ''.join(map(str, content)))
     if success:
         await add_bottle.finish(command + "成功")
+        # ran:int = random.randint(1,100)
+        # if (ran < 20):
+        #     msg = bottle_service.get_treasure_by_add(user_id = user_id)
+        #     await select_bottle.finish(msg)
     else:
         await add_bottle.finish("添加失败，请联系管理员（拿上时间截图招管理员拿币）")
 
@@ -42,15 +48,15 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=30):
 select_bottle = on_command(cmd = "捡瓶子", block=True, priority=2)
 @select_bottle.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=20):
+async def _(bot: Bot, event: GroupMessageEvent, cost=10):
     user_id = str(event.user_id)
     command = str(event.get_message()).strip().split()
     if len(command) == 1:
         # 概率获得捡到宝箱
         ran:int = random.randint(1,100)
-        if (ran < 10):
-            msg = bottle_service.get_treasure(user_id = user_id)
-            await select_bottle.finish(msg)
+        if (ran < 40):
+            msg = await bottle_service.get_treasure_by_select(user_id = user_id)
+            await select_bottle.send(msg)
         else:
             data = db_service.select_bottle()
             if data:
