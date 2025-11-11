@@ -26,7 +26,7 @@ __plugin_meta__ = PluginMetadata(
 add_bottle = on_command(cmd = "丢瓶子", block=True, priority=2)
 @add_bottle.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=30):
+async def _(bot: Bot, event: GroupMessageEvent, cost=20):
     user_id = str(event.user_id)
     args = str(event.get_message()).strip().split()
     if len(args) == 1:
@@ -48,7 +48,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=30):
 select_bottle = on_command(cmd = "捡瓶子", block=True, priority=2)
 @select_bottle.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=10):
+async def _(bot: Bot, event: GroupMessageEvent, cost=20):
     user_id = str(event.user_id)
     command = str(event.get_message()).strip().split()
     if len(command) == 1:
