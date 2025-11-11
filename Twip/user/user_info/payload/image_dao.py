@@ -54,15 +54,15 @@ async def get_card(user_id: str, user_name: str) -> str:
     # 写字
     f_a = FontEntity()
     f_a.setSize(75).setColor("#FFFFE0")
-    resp1 = write_longsh(f_a, img2, f"{level:<5}级", "C", (270, 0))
+    resp1 = write_longsh(f_a, img2, f"{level:<5}级", "C", (0, 250))
 
-    resp2 = write_longsh(f_a.setSize(50), resp1, f"{user_name}", "C", (530, 480))
+    resp2 = write_longsh(f_a.setSize(50), resp1, f"{user_name}", "C", (0, 480))
 
     resp2 = write_longsh(f_a, resp1, f"体力值： {user_data[1]}/{user_data[4]}", "L", (500, 660))
-    resp2 = write_longsh(f_a, resp1, f"健康值： {user_data[2]}/100", "L", (500, 760))
+    resp2 = write_longsh(f_a, resp1, f"生命值： {user_data[2]}/100", "L", (500, 760))
     resp2 = write_longsh(f_a, resp1, f"画境币： {user_data[3]}", "L", (500, 860))
-    resp2 = write_longsh(f_a, resp1, f"总发言： {user_data_old[4]}", "L", (500, 1060))
 
+    resp2 = write_longsh(f_a, resp1, f"总发言： {user_data_old[4]}", "L", (500, 1060))
     rank_data = await get_speak_info(user_id=user_id)
     resp2 = write_longsh(f_a, resp1, f"总排行： {rank_data[0]}", "L", (500, 1160))
     resp2 = write_longsh(f_a, resp1, f"当日发言： {rank_data[2]}", "L", (500, 1260))
