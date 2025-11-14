@@ -23,7 +23,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 
-add_bottle = on_command(cmd = "丢瓶子", block=True, priority=2)
+add_bottle = on_command(cmd = "X丢瓶子", block=True, priority=2)
 @add_bottle.handle()
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=20):
@@ -45,7 +45,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=20):
         await add_bottle.finish("添加失败，请联系管理员（拿上时间截图招管理员拿币）")
 
 
-select_bottle = on_command(cmd = "捡瓶子", block=True, priority=2)
+select_bottle = on_command(cmd = "X捡瓶子", block=True, priority=2)
 @select_bottle.handle()
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=20):
