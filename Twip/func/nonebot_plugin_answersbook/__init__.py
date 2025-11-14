@@ -7,6 +7,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageEvent, MessageSegment
 from nonebot.params import EventPlainText
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
+from tool.find_power.format_data import is_level_S
 
 __plugin_meta__ = PluginMetadata(
     name="答案之书",
@@ -29,6 +30,7 @@ look_answer = on_message(rule=startswith_or_endswith("翻看答案"))
 
 
 @look_answer.handle()
+@is_level_S
 async def answersbook(
     event: MessageEvent, state: T_State, message: str = EventPlainText(), cost = 30
 ) -> None:
