@@ -8,6 +8,8 @@ from PIL.Image import Image as IMG
 from PIL.ImageFilter import Filter
 from PIL.ImageDraw import ImageDraw as Draw
 from typing import List, Optional, Type, Union
+from pydantic import ConfigDict
+from pydantic_core import core_schema
 
 from .types import *
 from .gradient import Gradient
@@ -15,6 +17,14 @@ from .text2image import Text2Image
 
 
 class BuildImage:
+    # 添加 Pydantic 配置
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    # 添加 Pydantic 核心模式支持
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type, handler):
+        return core_schema.is_instance_schema(cls)
+    
     def __init__(self, image: IMG):
         self.image = image
 
@@ -151,7 +161,8 @@ class BuildImage:
         mask = Image.new("L", (image.width * 5, image.height * 5), 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0, mask.width, mask.height), 255)
-        mask = mask.resize(image.size, Image.ANTIALIAS)
+        # 使用新的重采样方法
+        mask = mask.resize(image.size, Image.LANCZOS)
         bg = Image.new("RGBA", image.size, (255, 255, 255, 0))
         return BuildImage(Image.composite(image, bg, mask))
 
@@ -161,7 +172,8 @@ class BuildImage:
         mask = Image.new("L", (image.width * 5, image.height * 5), 0)
         draw = ImageDraw.Draw(mask)
         draw.rounded_rectangle((0, 0, mask.width, mask.height), r * 5, fill=255)
-        mask = mask.resize(image.size, Image.ANTIALIAS)
+        # 使用新的重采样方法
+        mask = mask.resize(image.size, Image.LANCZOS)
         bg = Image.new("RGBA", image.size, (255, 255, 255, 0))
         return BuildImage(Image.composite(image, bg, mask))
 

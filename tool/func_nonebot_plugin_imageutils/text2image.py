@@ -67,8 +67,9 @@ class Char:
                 fill=self.fill,
                 embedded_color=True,
             )
+            # 使用新的重采样方法
             new_img = new_img.resize(
-                (int(self.width), int(self.height)), resample=Image.ANTIALIAS
+                (int(self.width), int(self.height)), resample=Image.LANCZOS
             )
             img.paste(new_img, pos, mask=new_img)
         else:
