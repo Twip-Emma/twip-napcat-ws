@@ -54,24 +54,24 @@ class BuildImage:
     def resize(
         self,
         size: SizeType,
-        resample: ResampleType = Image.ANTIALIAS,
+        resample: ResampleType = Image.LANCZOS,  # 替换为 LANCZOS
         keep_ratio: bool = False,
         inside: bool = False,
         direction: DirectionType = "center",
         bg_color: Optional[ColorType] = None,
         **kwargs,
-    ) -> "BuildImage":
+        ) -> "BuildImage":
         """
         调整图片尺寸
 
         :参数:
-          * ``size``: 期望图片大小
-          * ``keep_ratio``: 是否保持长宽比，默认为 `False`
-          * ``inside``: `keep_ratio` 为 `True` 时，
+            * ``size``: 期望图片大小
+            * ``keep_ratio``: 是否保持长宽比，默认为 `False`
+            * ``inside``: `keep_ratio` 为 `True` 时，
                         若 `inside` 为 `True`，则调整图片大小至包含于期望尺寸，不足部分设为指定颜色；
                         若 `inside` 为 `False`，则调整图片大小至包含期望尺寸，超出部分裁剪
-          * ``direction``: 调整图片大小时图片的方位；默认为居中
-          * ``bg_color``: 不足部分设置的颜色
+            * ``direction``: 调整图片大小时图片的方位；默认为居中
+            * ``bg_color``: 不足部分设置的颜色
         """
         width, height = size
         if keep_ratio:

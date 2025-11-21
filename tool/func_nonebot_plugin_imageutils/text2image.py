@@ -34,9 +34,17 @@ class Char:
             self.pilfont = self.font.load_font(fontsize)
 
         self.ascent, self.descent = self.pilfont.getmetrics()
-        self.width, self.height = self.pilfont.getsize(
+        
+        # 使用 getbbox() 替代 getsize()
+        bbox = self.pilfont.getbbox(
             self.char, stroke_width=self.stroke_width
         )
+        if bbox:
+            self.width = bbox[2] - bbox[0]  # right - left
+            self.height = bbox[3] - bbox[1]  # bottom - top
+        else:
+            # 如果 getbbox() 返回 None，使用备选方案
+            self.width, self.height = 0, 0
 
         if self.font.valid_size:
             ratio = fontsize / self.font.valid_size
