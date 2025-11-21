@@ -5,9 +5,9 @@ from datetime import datetime
 from collections import namedtuple
 from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
 
-from nonebot_plugin_imageutils import Text2Image
-from nonebot_plugin_imageutils.fonts import Font
-from nonebot_plugin_imageutils.gradient import LinearGradient, ColorStop
+from tool.func_nonebot_plugin_imageutils import Text2Image
+from tool.func_nonebot_plugin_imageutils.fonts import Font
+from tool.func_nonebot_plugin_imageutils.gradient import LinearGradient, ColorStop
 
 from .utils import *
 from .depends import *

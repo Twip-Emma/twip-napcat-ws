@@ -6,8 +6,8 @@ from pathlib import Path
 from nonebot.log import logger
 from nonebot import get_driver
 
-from nonebot_plugin_imageutils import BuildImage
-from nonebot_plugin_imageutils.fonts import add_font, Font
+from tool.func_nonebot_plugin_imageutils import BuildImage
+from tool.func_nonebot_plugin_imageutils.fonts import add_font, Font
 
 from .config import petpet_config
 

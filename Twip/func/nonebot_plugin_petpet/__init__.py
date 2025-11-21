@@ -26,7 +26,7 @@ from nonebot.adapters.onebot.v11.permission import (
 )
 
 # require("nonebot_plugin_imageutils")
-from nonebot_plugin_imageutils import BuildImage, Text2Image
+from tool.func_nonebot_plugin_imageutils import BuildImage, Text2Image
 
 from .utils import Meme
 from .config import Config

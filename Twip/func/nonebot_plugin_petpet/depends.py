@@ -15,7 +15,7 @@ from nonebot.adapters.onebot.v11 import (
     unescape,
 )
 
-from nonebot_plugin_imageutils import BuildImage
+from tool.func_nonebot_plugin_imageutils import BuildImage
 
 from .utils import UserInfo
 from .config import petpet_config

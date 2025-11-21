@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from PIL.Image import Image as IMG
 from typing import Callable, List, Literal, Protocol, Tuple, Optional
 
-from nonebot_plugin_imageutils import BuildImage
+from tool.func_nonebot_plugin_imageutils import BuildImage
 
 from .config import petpet_config
 
