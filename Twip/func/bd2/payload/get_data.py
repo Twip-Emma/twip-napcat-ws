@@ -67,7 +67,7 @@ async def redeem_coupon(user_id: str, coupon_code: str) -> str:
 
     async with aiohttp.ClientSession() as session:
         tasks = [
-            _get_single_redeem_result(session, nickname, coupon_code)
+            _get_single_redeem_result(session, nickname, coupon_code, user_id)
             for nickname in nicknames
         ]
         results = await asyncio.gather(*tasks)
@@ -77,7 +77,8 @@ async def redeem_coupon(user_id: str, coupon_code: str) -> str:
 async def _get_single_redeem_result(
     session: aiohttp.ClientSession, 
     nickname: str, 
-    coupon_code: str
+    coupon_code: str,
+    user_id: str
 ) -> str:
     """
     获取单个昵称的兑换结果（内部方法）
@@ -102,10 +103,16 @@ async def _get_single_redeem_result(
             # 韩语错误消息翻译
             if message == "쿠폰 사용 기간이 지났습니다.":
                 message = "兑换码已过期"
+                get_db.delete_coupon(coupon_code)
             elif message == "이미 사용된 쿠폰입니다.":
-                message = "兑换码已被使用"
+                message = "您已使用过此兑换码"
             elif message == "이미 사용한 쿠폰입니다. (키워드)":
-                message = "已经使用过的优惠券"
+                message = "您已使用过此兑换码"
+            elif message == "No campaign found":
+                message = "无效的兑换码"
+            elif "Failed to verify for" in message:
+                message = "不存在的玩家名，已自动删除"
+                get_db.delete_user_bindings_by_nickname(user_id=user_id, nickname=nickname)
                 
             return f"{nickname}: {message}"
 
@@ -141,7 +148,7 @@ async def redeem_all_coupons_for_user(user_id: str) -> str:
         # 为每个昵称兑换该兑换码
         async with aiohttp.ClientSession() as session:
             tasks = [
-                _get_single_redeem_result(session, nickname, code)
+                _get_single_redeem_result(session, nickname, code, user_id)
                 for nickname in nicknames
             ]
             redeem_results = await asyncio.gather(*tasks)
@@ -152,7 +159,8 @@ async def redeem_all_coupons_for_user(user_id: str) -> str:
 async def _get_single_redeem_result(
     session: aiohttp.ClientSession, 
     nickname: str, 
-    coupon_code: str
+    coupon_code: str,
+    user_id: str
 ) -> str:
     """
     获取单个昵称的兑换结果（内部方法）
@@ -177,8 +185,16 @@ async def _get_single_redeem_result(
             # 韩语错误消息翻译
             if message == "쿠폰 사용 기간이 지났습니다.":
                 message = "兑换码已过期"
+                get_db.delete_coupon(coupon_code)
+            elif message == "이미 사용된 쿠폰입니다.":
+                message = "您已使用过此兑换码"
             elif message == "이미 사용한 쿠폰입니다. (키워드)":
-                message = "兑换码已被使用"
+                message = "您已使用过此兑换码"
+            elif message == "No campaign found":
+                message = "无效的兑换码"
+            elif "Failed to verify for" in message:
+                message = "不存在的玩家名，已自动删除"
+                get_db.delete_user_bindings_by_nickname(user_id=user_id, nickname=nickname)
                 
             return f"{nickname}: {message}"
 

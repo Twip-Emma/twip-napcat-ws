@@ -77,7 +77,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=30):
 user_redeem_all = on_command("兑换全部", block=True, priority=2)
 @user_redeem_all.handle()
 @is_level_S
-async def _(bot: Bot, event: GroupMessageEvent, cost=80):
+async def _(bot: Bot, event: GroupMessageEvent, cost=30):
     user_id = str(event.user_id)
     await user_bind.send(f"user_id={user_id}:开始处理，耗时较久请耐心等待")
     result = await get_data.redeem_all_coupons_for_user(user_id)
