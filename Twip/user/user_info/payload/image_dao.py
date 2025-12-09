@@ -68,6 +68,11 @@ async def get_card(user_id: str, user_name: str) -> str:
     resp2 = write_longsh(f_a, resp1, f"当日发言： {rank_data[2]}", "L", (500, 1260))
     resp2 = write_longsh(f_a, resp1, f"当日排行： {rank_data[1]}", "L", (500, 1360))
 
+    resp2 = write_longsh(f_a, resp1, f"生命值： 0", "L", (500, 1560))
+    resp2 = write_longsh(f_a, resp1, f"攻击力： 0", "L", (500, 1660))
+    resp2 = write_longsh(f_a, resp1, f"精神力： 0", "L", (500, 1760))
+    resp2 = write_longsh(f_a, resp1, f"极性： 0/0", "L", (500, 1860))
+
     level_txt1 = f"升级到{level_data['now_level']+1}级需要花费{level_data['level_up']}画境币\n发送 升级 即可"
 
     resp2 = write_longsh(f_a.setSize(35), resp1, level_txt1, "C", (1800, 1800))

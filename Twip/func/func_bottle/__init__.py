@@ -23,7 +23,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 
-add_bottle = on_command(cmd = "X丢瓶子", block=True, priority=2)
+add_bottle = on_command(cmd = "丢瓶子", block=True, priority=2)
 @add_bottle.handle()
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=20):
@@ -32,7 +32,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=20):
     if len(args) == 1:
         await add_bottle.finish("格式错误，请发送以下命令查看标准格式：\n菜单 漂流瓶")
     command, *content = args
-    if len(content) > 5000:
+    if len(content) > 50:
         await add_bottle.finish("你发这么长想干嘛？")
     success = db_service.add_bottle(user_id = user_id, content = ''.join(map(str, content)))
     if success:
@@ -45,7 +45,7 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=20):
         await add_bottle.finish("添加失败，请联系管理员（拿上时间截图招管理员拿币）")
 
 
-select_bottle = on_command(cmd = "X捡瓶子", block=True, priority=2)
+select_bottle = on_command(cmd = "捡瓶子", block=True, priority=2)
 @select_bottle.handle()
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=20):
@@ -60,12 +60,13 @@ async def _(bot: Bot, event: GroupMessageEvent, cost=20):
         else:
             data = db_service.select_bottle()
             if data:
-                image_path = text_to_image(data[1], 15, (10, 10))
-                with open(image_path, "rb") as f:
-                    image_data = f.read()
-                base64_str = f"base64://{base64.b64encode(image_data).decode()}"
-                image_msg = MessageSegment.image(base64_str)
-                await select_bottle.finish(image_msg)
+                # image_path = text_to_image(data[1], 15, (10, 10))
+                # with open(image_path, "rb") as f:
+                #     image_data = f.read()
+                # base64_str = f"base64://{base64.b64encode(image_data).decode()}"
+                # image_msg = MessageSegment.image(base64_str)
+                # await select_bottle.finish(image_msg)
+                await select_bottle.finish(data[1])
             else:
                 await select_bottle.finish(command[0] + "失败，请联系管理员（拿上时间截图招管理员拿币）")
     else:
