@@ -79,8 +79,15 @@ user_redeem_all = on_command("兑换全部", block=True, priority=2)
 @is_level_S
 async def _(bot: Bot, event: GroupMessageEvent, cost=30):
     user_id = str(event.user_id)
-    await user_bind.send(f"user_id={user_id}:开始处理，耗时较久请耐心等待")
-    result = await get_data.redeem_all_coupons_for_user(user_id)
+    group_id = str(event.group_id)
+    recall_user_info = await bot.get_group_member_info(group_id=group_id, user_id=user_id)
+    # 是否包含乱码
+    try:
+        user_name = recall_user_info['nickname']
+    except:
+        user_name = user_id
+    await user_bind.send(f"开始处理{user_name}的兑换，耗时较久请耐心等待")
+    result = await get_data.redeem_all_coupons_for_user(user_id, user_name)
     image_path = text_to_image(result, 15, (10, 10))
     with open(image_path, "rb") as f:
         image_data = f.read()

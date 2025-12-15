@@ -114,13 +114,13 @@ async def _get_single_redeem_result(
                 message = "不存在的玩家名，已自动删除"
                 get_db.delete_user_bindings_by_nickname(user_id=user_id, nickname=nickname)
                 
-            return f"{nickname}: {message}"
+            return f"【{nickname}】 {message}"
 
     except Exception as e:
         return f"{nickname}: 请求失败({str(e)})"
 
 
-async def redeem_all_coupons_for_user(user_id: str) -> str:
+async def redeem_all_coupons_for_user(user_id: str, user_name: str) -> str:
     """
     为指定用户兑换所有可用兑换码
     :param user_id: 用户ID
@@ -135,7 +135,7 @@ async def redeem_all_coupons_for_user(user_id: str) -> str:
     if not coupons:
         return "未能获取到任何兑换码"
     
-    results = []
+    results = [f'{user_name}的兑换情况如下\n']
     
     for coupon in coupons:
         code = coupon["code"]
@@ -143,7 +143,7 @@ async def redeem_all_coupons_for_user(user_id: str) -> str:
         status = coupon["status"]
         
         # 添加兑换码信息
-        results.append(f"兑换码: {code} | 奖励: {reward} | 有效期: {status}")
+        results.append(f"\n>>>>兑换码: {code} 奖励: {reward}")
         
         # 为每个昵称兑换该兑换码
         async with aiohttp.ClientSession() as session:
@@ -196,7 +196,7 @@ async def _get_single_redeem_result(
                 message = "不存在的玩家名，已自动删除"
                 get_db.delete_user_bindings_by_nickname(user_id=user_id, nickname=nickname)
                 
-            return f"{nickname}: {message}"
+            return f"【{nickname}】 {message}"
 
     except Exception as e:
         return f"{nickname}: 请求失败({str(e)})"
