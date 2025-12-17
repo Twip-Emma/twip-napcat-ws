@@ -35,3 +35,8 @@ ALTER TABLE message_analyze ADD INDEX idx_user_query (
 
 -- 添加更新时间索引（用于监控）
 ALTER TABLE message_analyze ADD INDEX idx_update_time (update_time);
+
+-- 添加关键词索引
+ALTER TABLE message_analyze ADD INDEX idx_key_word (
+    key_word
+);

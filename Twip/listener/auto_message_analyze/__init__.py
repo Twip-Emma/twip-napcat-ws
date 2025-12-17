@@ -10,6 +10,7 @@ from tool.find_power.format_data import is_level_S
 from tool.utils.logger import logger as my_logger
 from tool.utils import db
 from pathlib import Path
+from .payload import analyze
 BASE_PATH: str = Path(__file__).absolute().parents[0]
 
 
@@ -39,6 +40,25 @@ STOP_WORDS = {
 "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个", "上", "也", "很", "到",
 "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这"
 }
+
+
+# 初始化jieba分词（可选：加载用户词典）
+def init_jieba():
+    """初始化jieba分词器"""
+    print("【消息分析】开始初始化词库")
+    # 空加载器
+    custom_jieba = jieba.Tokenizer()
+    custom_jieba.initialize()
+
+    # 可以加载自定义词典
+    custom_jieba.load_userdict(str(Path(BASE_PATH) / "字典-分词词库-净化.txt"))
+    custom_jieba.load_userdict(str(Path(BASE_PATH) / "字典-棕色尘埃2.txt"))
+    print("【消息分析】初始化词库完成")
+
+
+# 在模块加载时初始化
+init_jieba()
+
 
 # 创建消息处理器
 message_handle = on_message(block=False, priority=1)
@@ -408,24 +428,42 @@ async def handle_sync(event: GroupMessageEvent, args: Message = CommandArg(), co
         await sync_cmd.finish(f"数据同步异常，当前指针位置：{id}")
 
 
+# 同步老数据
+delete_cmd = on_command("删除停用词", permission=SUPERUSER, priority=5)
+
+@delete_cmd.handle()
+@is_level_S
+async def handle_sync(event: GroupMessageEvent, args: Message = CommandArg(), cost=0):
+    args = str(event.get_message()).strip().split()
+
+    if len(args) == 1:
+        await delete_cmd.send(f"开始删除停用词")
+        try:
+            with open(Path(BASE_PATH) / "字典-停用词库.txt", 'r', encoding='utf-8') as f:
+                for line in f:
+                    word = line.strip()
+                    sql1 = "DELETE FROM message_analyze WHERE key_word = %s"
+                    db.sql_dml(sql1, (word,))
+        except Exception as db_error:
+            my_logger.info(f"删除停用词异常: error={db_error}")
+            await delete_cmd.finish(f"删除停用词异常")
+    elif len(args) == 2:
+        try:
+            key_word = args[1]
+            await delete_cmd.send(f"开始删除停用词：{key_word}")
+            sql1 = "DELETE FROM message_analyze WHERE key_word = %s"
+            db.sql_dml(sql1, (key_word,))
+            await analyze.remove_keyword_from_dictionary(key_word, Path(BASE_PATH) / "字典-分词词库-净化.txt")
+        except Exception as db_error:
+            my_logger.info(f"删除停用词异常: error={db_error}")
+            await delete_cmd.finish(f"删除停用词异常")
+    else:
+        await delete_cmd.finish(f"参数错误，请参考：菜单 我的热词")
+    await delete_cmd.finish(f"删除停用词完成")
+
+
+    
+
+
         
 
-# 初始化jieba分词（可选：加载用户词典）
-def init_jieba():
-    """初始化jieba分词器"""
-    # 可以加载自定义词典
-    jieba.load_userdict(str(Path(BASE_PATH) / "词库-IK分词.txt"))
-    jieba.load_userdict(str(Path(BASE_PATH) / "词库-jieba分词.txt"))
-    jieba.load_userdict(str(Path(BASE_PATH) / "词库-mmseg分词.txt"))
-    jieba.load_userdict(str(Path(BASE_PATH) / "词库-word分词.txt"))
-    jieba.load_userdict(str(Path(BASE_PATH) / "词库-百度300.txt"))
-    
-    # 添加一些常见网络用语到词典
-    jieba.add_word("卧槽")
-
-    print("消息分析-初始化 初始化词库完成")
-    my_logger.info(f"消息分析-初始化", "初始化词库完成")
-
-
-# 在模块加载时初始化
-init_jieba()
