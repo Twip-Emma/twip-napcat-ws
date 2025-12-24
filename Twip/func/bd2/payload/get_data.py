@@ -113,6 +113,10 @@ async def _get_single_redeem_result(
             elif "Failed to verify for" in message:
                 message = "不存在的玩家名，已自动删除"
                 get_db.delete_user_bindings_by_nickname(user_id=user_id, nickname=nickname)
+            elif message == "이미 사용한 쿠폰입니다. (난수)":
+                message = "此兑换码为一次性的，已被使用"
+            elif "Lock failed. Maybe multiple requests found." in message:
+                message = "使用人数过多，请稍后重试"
                 
             return f"【{nickname}】 {message}"
 
@@ -195,6 +199,10 @@ async def _get_single_redeem_result(
             elif "Failed to verify for" in message:
                 message = "不存在的玩家名，已自动删除"
                 get_db.delete_user_bindings_by_nickname(user_id=user_id, nickname=nickname)
+            elif message == "이미 사용한 쿠폰입니다. (난수)":
+                message = "此兑换码为一次性的，已被使用"
+            elif "Lock failed. Maybe multiple requests found." in message:
+                message = "使用人数过多，请稍后重试"
                 
             return f"【{nickname}】 {message}"
 

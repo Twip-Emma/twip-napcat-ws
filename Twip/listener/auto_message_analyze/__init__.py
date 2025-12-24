@@ -40,20 +40,23 @@ STOP_WORDS = {
 "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个", "上", "也", "很", "到",
 "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这"
 }
+custom_jieba = None
 
 
 # 初始化jieba分词（可选：加载用户词典）
 def init_jieba():
-    """初始化jieba分词器"""
     print("【消息分析】开始初始化词库")
-    # 空加载器
-    custom_jieba = jieba.Tokenizer()
-    custom_jieba.initialize()
+    global custom_jieba
+
+    new_tokenizer = jieba.Tokenizer()
+    new_tokenizer.initialize()
 
     # 可以加载自定义词典
-    custom_jieba.load_userdict(str(Path(BASE_PATH) / "字典-分词词库-净化.txt"))
-    custom_jieba.load_userdict(str(Path(BASE_PATH) / "字典-棕色尘埃2.txt"))
+    new_tokenizer.load_userdict(str(Path(BASE_PATH) / "字典-分词词库-净化.txt"))
+    new_tokenizer.load_userdict(str(Path(BASE_PATH) / "字典-棕色尘埃2.txt"))
+    custom_jieba = new_tokenizer
     print("【消息分析】初始化词库完成")
+    
 
 
 # 在模块加载时初始化
@@ -344,8 +347,6 @@ async def handle_hot(event: GroupMessageEvent, args: Message = CommandArg(), cos
         SELECT key_word, SUM(count) as hot_count
         FROM message_analyze 
         WHERE group_id = %s 
-          AND is_deleted = FALSE
-          AND create_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         GROUP BY key_word
         ORDER BY hot_count DESC
         LIMIT 10
@@ -459,6 +460,11 @@ async def handle_sync(event: GroupMessageEvent, args: Message = CommandArg(), co
             await delete_cmd.finish(f"删除停用词异常")
     else:
         await delete_cmd.finish(f"参数错误，请参考：菜单 我的热词")
+        
+    # 重新加载
+    await delete_cmd.send(f"重新加载词库：{key_word}")
+    init_jieba()
+
     await delete_cmd.finish(f"删除停用词完成")
 
 
