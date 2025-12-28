@@ -53,6 +53,8 @@ from ..manager import meme_manager
 from ..recorder import record_meme_generation
 from .utils import UserId
 
+from tool.find_power.format_data import is_level_S
+
 alc_config.command_max_count += 1000
 
 
@@ -269,7 +271,9 @@ def create_matcher(meme: Meme):
         matcher.append_handler(shortcut_handler)
 
 
+
 def create_handler(meme: Meme, shortcut: Optional[MemeShortcut] = None) -> T_Handler:
+    @is_level_S
     async def handler(
         bot: Bot,
         event: Event,
@@ -279,6 +283,7 @@ def create_handler(meme: Meme, shortcut: Optional[MemeShortcut] = None) -> T_Han
         session: Uninfo,
         interface: QryItrface,
         alc_matches: AlcMatches,
+        cost = 30
     ):
         if not meme_manager.check(user_id, meme.key):
             logger.info(f"用户 {user_id} 表情 {meme.key} 被禁用")

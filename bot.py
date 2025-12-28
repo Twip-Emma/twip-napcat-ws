@@ -7,6 +7,7 @@ FilePath: \twip-napcat\bot.py
 Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 '''
 import nonebot
+from nonebot import require
 from nonebot.adapters.onebot.v11 import Adapter as ONEBOT_V11Adapter
 # from nonebot.log import logger, logger_id
 # logger.remove(logger_id)
@@ -42,7 +43,7 @@ nonebot.init(apscheduler_config={
 
 # 正式模块
 # nonebot.load_plugins("src/plugins/admin")
-# nonebot.load_plugins("src/plugins/function")
+# nonebot.load_plugins("Twip/func")
 # nonebot.load_plugins("src/plugins/user")
 # nonebot.load_plugins("src/plugins/listener")
 # nonebot.load_plugins("src/plugins/speaker")
@@ -53,6 +54,10 @@ nonebot.load_plugin("Twip")
 
 # 全局模块
 # nonebot.load_plugin()
+
+# 加载插件市场的
+# require("nonebot_plugin_memes")
+# nonebot.load_plugin("nonebot_plugin_memes")
 
 # 加载绝对路径头
 ABSOLUTE_PATH = path.join(path.dirname(__file__))

@@ -1,5 +1,7 @@
 # twip-napcat-ws
 
+本地已验证能正常运行的python版本：3.13.2、3.13.11
+
 ## 用正向连接的twip
 
 napcat配置服务端

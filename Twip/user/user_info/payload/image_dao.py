@@ -26,7 +26,7 @@ async def get_card(user_id: str, user_name: str) -> str:
     avatar_path = await get_avatar(user_id)
 
     # 2.背景合成
-    bg_list = [x for x in Path(Path(BASE_PATH)/"image").glob("bg*.png")]
+    bg_list = [x for x in Path(Path(BASE_PATH)/"image").glob("bg*.jpg")]
     bg_path = str(bg_list[random.randint(0, len(bg_list) - 1)])
     bg = Image.open(bg_path).convert('RGBA')
     
