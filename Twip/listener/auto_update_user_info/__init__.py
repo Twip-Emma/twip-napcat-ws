@@ -8,7 +8,7 @@ Description: file content
 import random
 from nonebot import on_message
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent
-from tool.find_power.user_database import change_user_crime
+from tool.find_power.user_database import change_user_crime, get_user_info_new, insert_user_info_new
 
 from .database import start
 
@@ -46,6 +46,11 @@ async def _(bot: Bot, event: GroupMessageEvent):
         user_name = user_id
     # user_name = re.findall(r'[\u4e00-\u9fa5]', user_name) # 使用通配符只匹配汉字
     # user_name = "".join(user_name)
+
+    r1 = get_user_info_new(user_id=user_id)
+    if not r1:
+        insert_user_info_new(user_id=user_id)
+
     flag = random.randint(1,100)
     if flag <= 5:
         change_user_crime(user_id=user_id, num="+5")
