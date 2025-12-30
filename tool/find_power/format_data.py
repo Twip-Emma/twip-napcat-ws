@@ -58,7 +58,6 @@ def is_level_is_inner(event: GroupMessageEvent) -> bool:
     level_S, _, ban_user = _get_data()
     user_id = str(event.user_id)
     group_id = str(event.group_id)
-    print(f"无权限的用户 群号:{group_id}, qq号:{user_id}")
     if user_id in ban_user:
         return False
     if group_id not in level_S:
@@ -94,7 +93,6 @@ def is_level_A(func):
 # 行动点扣除
 def delete_user_coin(user_id:str, cost:int) -> bool:
     user_data = get_user_info_new(user_id=user_id)
-    print(user_data)
     if not user_data:
         insert_user_info_new(user_id=user_id)
         user_data = get_user_info_new(user_id=user_id)
