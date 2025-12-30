@@ -109,11 +109,8 @@ def create_matchers():
             event:GroupMessageEvent,
             matcher: Matcher,
             cost=30,
-            flag: Literal[True] = check_flag(meme),
             res: Union[str, BytesIO] = Depends(meme.func),
         ):
-            if not flag:
-                return
             matcher.stop_propagation()
             if isinstance(res, str):
                 await matcher.finish(res)

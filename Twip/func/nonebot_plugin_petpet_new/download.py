@@ -56,6 +56,8 @@ async def check_font(family: str, fontname: str):
 
 
 async def check_resources():
+    # 分离化项目，不下载资源
+    return
     resource_list = json.loads(
         (await download_resource("resource_list.json")).decode("utf-8")
     )

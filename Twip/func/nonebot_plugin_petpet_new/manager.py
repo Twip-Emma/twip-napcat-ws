@@ -111,6 +111,9 @@ class MemeManager:
         return False
 
     def __load(self):
+        # 分离化项目，不用解析了
+        return
+
         raw_list: Dict[str, Any] = {}
         if self.__path.exists():
             with self.__path.open("r", encoding="utf-8") as f:

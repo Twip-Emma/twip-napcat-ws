@@ -53,6 +53,19 @@ def is_level_S(func):
     return check_power
 
 
+# 手动校验
+def is_level_is_inner(event: GroupMessageEvent) -> bool:
+    level_S, _, ban_user = _get_data()
+    user_id = str(event.user_id)
+    group_id = str(event.group_id)
+    print(f"无权限的用户 群号:{group_id}, qq号:{user_id}")
+    if user_id in ban_user:
+        return False
+    if group_id not in level_S:
+        return False
+    return True
+
+
 # 权限校验：A
 def is_level_A(func):
     @wraps(func)
