@@ -193,7 +193,7 @@ def parse_datetime(key: str):
 async def handle_first_receive(
     event: GroupMessageEvent, state: T_State, type: Optional[str] = None, time: Optional[str] = None, cost = 50
 ):
-    if not is_level_is_inner(event=event):
+    if not is_level_is_inner(event=event, cost=100):
         await wordcloud_cmd.finish()
     dt = get_datetime_now_with_timezone()
 

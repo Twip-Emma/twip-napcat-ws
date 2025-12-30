@@ -54,7 +54,7 @@ def is_level_S(func):
 
 
 # 手动校验
-def is_level_is_inner(event: GroupMessageEvent) -> bool:
+def is_level_is_inner(event: GroupMessageEvent, cost: int = 0) -> bool:
     level_S, _, ban_user = _get_data()
     user_id = str(event.user_id)
     group_id = str(event.group_id)
@@ -62,6 +62,9 @@ def is_level_is_inner(event: GroupMessageEvent) -> bool:
         return False
     if group_id not in level_S:
         return False
+    # 扣费
+    if cost != 0:
+        delete_user_coin(user_id=user_id, cost=cost)
     return True
 
 
