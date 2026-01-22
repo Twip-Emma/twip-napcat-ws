@@ -1,7 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-
 import random
-
 from .db import sql_dml, sql_dql
 import datetime
 import uuid
@@ -10,25 +8,55 @@ ABSOLUTE_PATH: str = Path(__file__).absolute().parents[0]
 TTF = Path(ABSOLUTE_PATH) / "zh-cn.ttf"
 
 
-# 绘制背景
+# 绘制背景 - 修改为菱形分布
 def draw_circles(image):
     draw = ImageDraw.Draw(image)
 
-    # 定义圆的半径和圆心之间的距离
+    # 定义圆的半径和圆心之间的距离（保持原来的100）
     radius = 5
-    distance = 100
+    distance = 100  # 保持原来的100像素间距
 
-    # 设置第一个小圆点的圆心位置为(50, 50)
-    center_x = 100
-    center_y = 100
-
-    # 在图片上均匀分布10x10个白色小圆点
-    for i in range(9):
-        for j in range(9):
-            # 计算每个小圆点的圆心坐标
-            current_x = center_x + i * distance
-            current_y = center_y + j * distance
-
+    # 图片尺寸 - 增大以适应菱形分布
+    width, height = 1600, 1600  # 增大尺寸
+    
+    # 定义菱形分布的参数
+    # 总行数：15行（1,3,5,7,9,11,13,15,13,11,9,7,5,3,1）
+    # 中心行是第8行（索引7），中心列是第8列（索引7）
+    
+    center_row_index = 7  # 中心行索引
+    center_col_index = 7  # 中心列索引
+    
+    # 中心点的坐标（第7行第7列）
+    center_x = 100 + center_col_index * distance
+    center_y = 100 + center_row_index * distance
+    
+    # 生成菱形分布的圆点坐标
+    valid_positions = set()  # 用于记录有效的圆点位置
+    position_matrix = {}     # 用于快速查找位置
+    
+    for row in range(15):  # 总共15行
+        # 计算当前行距离中心行的距离
+        row_distance_from_center = abs(row - center_row_index)
+        
+        # 计算当前行的圆点数量
+        dots_in_row = 15 - 2 * row_distance_from_center
+        
+        # 计算当前行的y坐标
+        current_y = center_y - (center_row_index - row) * distance
+        
+        # 计算当前行的起始列索引
+        start_col_index = center_col_index - (dots_in_row // 2)
+        
+        # 绘制当前行的所有圆点
+        for col_offset in range(dots_in_row):
+            col_index = start_col_index + col_offset
+            current_x = center_x + (col_index - center_col_index) * distance
+            
+            # 记录位置
+            pos = (current_x, current_y)
+            valid_positions.add(pos)
+            position_matrix[(row, col_index)] = pos
+            
             # 绘制白色小圆点
             draw.ellipse(
                 [
@@ -37,18 +65,20 @@ def draw_circles(image):
                 ],
                 fill=(255, 255, 255)
             )
-    return image
+    
+    return image, valid_positions, position_matrix, center_x, center_y, distance, center_row_index, center_col_index
 
 
 # 写字
 async def draw_bg():
-    # 创建一个黑色背景的图片
-    width, height = 1000, 1000
+    # 创建一个黑色背景的图片（增大尺寸）
+    width, height = 1600, 1600  # 增大尺寸
     background_color = (0, 0, 0)
     image = Image.new("RGB", (width, height), background_color)
 
-    # 调用绘制圆点的函数
-    draw = ImageDraw.Draw(draw_circles(image))
+    # 调用绘制圆点的函数，并获取有效位置
+    image_with_circles, valid_positions, position_matrix, center_x, center_y, distance, center_row_index, center_col_index = draw_circles(image)
+    draw = ImageDraw.Draw(image_with_circles)
 
     # 定义字体和文字
     font_path = TTF  # 替换为你的字体文件路径
@@ -64,17 +94,65 @@ async def draw_bg():
     # 记录已绘制文字的坐标
     drawn_coordinates = set()
 
-    # 定义固定字的坐标
-    draw.text((500 + drift, 500 + drift), "空", font=font, fill=(255, 0, 0))
-    drawn_coordinates.add((500 + drift, 500 + drift))
-    draw.text((100 + drift, 100 + drift), "吉", font=font, fill=(255, 255, 0))
-    drawn_coordinates.add((100 + drift, 100 + drift))
-    draw.text((900 + drift, 100 + drift), "平", font=font, fill=(255, 255, 0))
-    drawn_coordinates.add((900 + drift, 100 + drift))
-    draw.text((100 + drift, 900 + drift), "诡", font=font, fill=(255, 255, 0))
-    drawn_coordinates.add((100 + drift, 900 + drift))
-    draw.text((900 + drift, 900 + drift), "厄", font=font, fill=(255, 255, 0))
-    drawn_coordinates.add((900 + drift, 900 + drift))
+    # 定义中心点（第7行第7列）
+    center_point = (center_x + drift, center_y + drift)
+    
+    # 获取菱形的四个顶点坐标
+    # 1. 上顶点：第0行唯一的点
+    # 2. 右顶点：第7行最右边的点（第14列）
+    # 3. 下顶点：第14行唯一的点  
+    # 4. 左顶点：第7行最左边的点（第0列）
+    
+    corner_points = []
+    
+    # 上顶点 - 第0行唯一的点
+    top_row = 0
+    for col in range(15):
+        if (top_row, col) in position_matrix:
+            corner_points.append(position_matrix[(top_row, col)])
+            break
+    
+    # 右顶点 - 第7行最右边的点（第14列）
+    center_row = 7
+    right_col = 14
+    if (center_row, right_col) in position_matrix:
+        corner_points.append(position_matrix[(center_row, right_col)])
+    
+    # 下顶点 - 第14行唯一的点
+    bottom_row = 14
+    for col in range(15):
+        if (bottom_row, col) in position_matrix:
+            corner_points.append(position_matrix[(bottom_row, col)])
+            break
+    
+    # 左顶点 - 第7行最左边的点（第0列）
+    left_col = 0
+    if (center_row, left_col) in position_matrix:
+        corner_points.append(position_matrix[(center_row, left_col)])
+    
+    # 如果找不到某个顶点，使用默认位置
+    while len(corner_points) < 4:
+        # 补充缺失的顶点
+        if len(corner_points) == 0:
+            corner_points.append((center_x, center_y - 7 * distance))  # 上
+        if len(corner_points) == 1:
+            corner_points.append((center_x + 7 * distance, center_y))  # 右
+        if len(corner_points) == 2:
+            corner_points.append((center_x, center_y + 7 * distance))  # 下
+        if len(corner_points) == 3:
+            corner_points.append((center_x - 7 * distance, center_y))  # 左
+
+    # 绘制固定文字
+    # 中心点：空（红色）
+    draw.text(center_point, "空", font=font, fill=(255, 0, 0))
+    drawn_coordinates.add(center_point)
+    
+    # 四个顶点：吉、平、诡、厄（黄色）
+    corner_labels = ["吉", "平", "诡", "厄"]
+    for i in range(4):
+        point = (corner_points[i][0] + drift, corner_points[i][1] + drift)
+        draw.text(point, corner_labels[i], font=font, fill=(255, 255, 0))
+        drawn_coordinates.add(point)
 
 
     # 判断当日是否生成了文字坐标
@@ -91,18 +169,40 @@ async def draw_bg():
             draw.text((point_list[index][0], point_list[index][1]), characters[index], font=font, fill=(255, 255, 255))
     else:
         add_list = []
+        # 从菱形范围内的有效位置中随机选择8个点（排除已使用的位置）
+        # 首先获取菱形内的所有有效位置（排除中心点和四个顶点）
+        available_positions = list(valid_positions - drawn_coordinates)
+        
+        # 确保至少8个可用位置
+        if len(available_positions) < 8:
+            # 如果位置不够，重新生成菱形内所有可能的位置
+            all_rhombus_positions = set()
+            for row in range(15):
+                row_distance_from_center = abs(row - center_row_index)
+                dots_in_row = 15 - 2 * row_distance_from_center
+                current_y = center_y - (center_row_index - row) * distance
+                start_col_index = center_col_index - (dots_in_row // 2)
+                
+                for col_offset in range(dots_in_row):
+                    col_index = start_col_index + col_offset
+                    current_x = center_x + (col_index - center_col_index) * distance
+                    all_rhombus_positions.add((current_x, current_y))
+            
+            # 从所有菱形位置中排除已使用的位置
+            available_positions = list(all_rhombus_positions - drawn_coordinates)
+        
+        random.shuffle(available_positions)
+        
         for character in characters:
-            while True:
-                # 随机选择一个位置
-                x = random.randint(1, 8) * 100 + drift
-                y = random.randint(1, 8) * 100 + drift
-
-                # 如果该位置未被占用，则绘制文字并跳出循环
-                if (x, y) not in drawn_coordinates:
-                    drawn_coordinates.add((x, y))
-                    add_list.append((x, y))
-                    draw.text((x, y), character, font=font, fill=(255, 255, 255))
+            while available_positions:
+                pos = available_positions.pop()
+                pos_with_drift = (pos[0] + drift, pos[1] + drift)
+                if pos_with_drift not in drawn_coordinates:
+                    drawn_coordinates.add(pos_with_drift)
+                    add_list.append(pos_with_drift)
+                    draw.text(pos_with_drift, character, font=font, fill=(255, 255, 255))
                     break
+        
         await sql_dml(
             "insert into user_sign (id, user_id, time, sign)values(?,?,?,?)",
             (
@@ -113,7 +213,7 @@ async def draw_bg():
             )
         )
     
-    return image
+    return image_with_circles, valid_positions, position_matrix, center_x, center_y, distance, center_row_index, center_col_index
 
 
 # 在两个点之间画线段
@@ -129,55 +229,86 @@ def draw_line_between_points(image, point1, point2):
     return image
 
 
-# 随机生成路径
+# 随机生成路径 - 只在有效圆点位置之间移动
 def generate_random_circle_coordinates():
-    # 定义相邻圆点的相邻位置
-    neighbor_positions = [
-        (-1, -1), (-1, 0), (-1, 1),
-        (0, -1),           (0, 1),
-        (1, -1),  (1, 0),  (1, 1)
+    # 生成菱形分布的有效位置
+    distance = 100
+    center_row_index = 7
+    center_col_index = 7
+    center_x = 100 + center_col_index * distance
+    center_y = 100 + center_row_index * distance
+    
+    valid_positions = set()
+    position_matrix = {}
+    
+    for row in range(15):
+        row_distance_from_center = abs(row - center_row_index)
+        dots_in_row = 15 - 2 * row_distance_from_center
+        current_y = center_y - (center_row_index - row) * distance
+        start_col_index = center_col_index - (dots_in_row // 2)
+        
+        for col_offset in range(dots_in_row):
+            col_index = start_col_index + col_offset
+            current_x = center_x + (col_index - center_col_index) * distance
+            pos = (current_x, current_y)
+            valid_positions.add(pos)
+            position_matrix[(row, col_index)] = pos
+    
+    # 定义相邻方向（8个方向，每个方向100像素）
+    directions = [
+        (-distance, -distance), (0, -distance), (distance, -distance),
+        (-distance, 0), (distance, 0),
+        (-distance, distance), (0, distance), (distance, distance)
     ]
-
-    # 定义初始点和存储生成的圆点坐标
-    initial_point = (500, 500)
+    
+    # 从中心点开始（第7行第7列）
+    initial_point = (center_x, center_y)
     circle_coordinates = [initial_point]
-
     used_coordinates = set([initial_point])
-
+    
+    # 为每个位置找到有效的相邻位置
+    position_neighbors = {}
+    for pos in valid_positions:
+        neighbors = []
+        for direction in directions:
+            neighbor_pos = (pos[0] + direction[0], pos[1] + direction[1])
+            if neighbor_pos in valid_positions:
+                neighbors.append(neighbor_pos)
+        position_neighbors[pos] = neighbors
+    
     for _ in range(30):
-        # 从相邻位置中随机选择下一个点
-        next_position = random.choice(neighbor_positions)
-
-        # 计算下一个点的坐标
-        next_x = circle_coordinates[-1][0] + next_position[0] * 100
-        next_y = circle_coordinates[-1][1] + next_position[1] * 100
-
-        # 将坐标限制在[100, 900]的范围内
-        next_x = max(99, min(next_x, 901))
-        next_y = max(99, min(next_y, 901))
-
-        # 如果下一个坐标已经被使用，则回到中心坐标
-        if (next_x, next_y) in used_coordinates:
-            next_x, next_y = initial_point
-
-        # 将下一个点添加到列表中
-        circle_coordinates.append((next_x, next_y))
-        used_coordinates.add((next_x, next_y))
-
+        current_pos = circle_coordinates[-1]
+        possible_next = []
+        
+        # 获取当前点的所有有效邻居
+        if current_pos in position_neighbors:
+            neighbors = position_neighbors[current_pos]
+            possible_next = [pos for pos in neighbors if pos not in used_coordinates]
+        
+        if possible_next:
+            # 随机选择一个有效邻居
+            next_pos = random.choice(possible_next)
+            circle_coordinates.append(next_pos)
+            used_coordinates.add(next_pos)
+        else:
+            # 如果没有可用邻居，回到中心点
+            circle_coordinates.append(initial_point)
+            used_coordinates.add(initial_point)
+    
     return circle_coordinates
 
 
 # 写字
 def write_char(char_name, bg):
-    bg_size = (1000, 1000)
+    bg_size = bg.size
     font = ImageFont.truetype(TTF, 50)
     draw = ImageDraw.Draw(bg)
     
     # 直接使用textlength获取宽度（Pillow 8.0.0+）
     text_width = font.getlength(char_name)
     
-    # 写字
-    draw.text((int((bg_size[0]-text_width)/2), 925),
+    # 写字 - 在底部居中位置
+    draw.text((int((bg_size[0]-text_width)/2), bg_size[1] - 75),
               char_name, fill="#ffffffff", font=font)
     return bg
 
@@ -206,14 +337,32 @@ async def get_sign_image(user_id: str, user_name: str, random_circle_coordinates
                 str(random_circle_coordinates)
             )
         )
-    bg = await draw_bg()
-    for index in range(len(random_circle_coordinates) - 1):
-        if index != 0 and random_circle_coordinates[index + 1] == (500, 500):
+    
+    # 获取背景和有效位置
+    bg, valid_positions, position_matrix, center_x, center_y, distance, center_row_index, center_col_index = await draw_bg()
+    
+    # 确保所有坐标都在有效位置中（带偏移）
+    drift = 5
+    adjusted_coordinates = []
+    for coord in random_circle_coordinates:
+        # 如果有偏移需求，可以在这里添加
+        adjusted_coord = (coord[0] + drift, coord[1] + drift)
+        # 确保坐标在有效范围内
+        if coord not in valid_positions:
+            # 找到最近的有效点
+            closest_point = min(valid_positions, key=lambda p: 
+                               (p[0]-coord[0])**2 + (p[1]-coord[1])**2)
+            adjusted_coord = (closest_point[0] + drift, closest_point[1] + drift)
+        adjusted_coordinates.append(adjusted_coord)
+    
+    # 绘制线条
+    for index in range(len(adjusted_coordinates) - 1):
+        if index != 0 and adjusted_coordinates[index + 1] == (center_x + drift, center_y + drift):
             continue
-        bg = draw_line_between_points(bg, random_circle_coordinates[index], random_circle_coordinates[index + 1])
+        bg = draw_line_between_points(bg, adjusted_coordinates[index], adjusted_coordinates[index + 1])
+    
     # 最后在bg上居中位置且靠底部的位置写字
     bg = write_char(user_name, bg)
     save = Path(ABSOLUTE_PATH) / "cache" / f"{user_id}.jpg"
     bg.save(save)
     return save
-    
